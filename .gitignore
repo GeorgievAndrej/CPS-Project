@@ -1,0 +1,11 @@
+# Android
+TeacherApp/.gradle/
+TeacherApp/build/
+TeacherApp/app/build/
+TeacherApp/local.properties
+TeacherApp/.idea/
+
+# Тест фајлови
+cps_backend/test.php
+cps_backend/test_login.php
+cps_backend/test_post.php
