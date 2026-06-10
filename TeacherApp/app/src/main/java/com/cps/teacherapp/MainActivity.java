@@ -29,13 +29,10 @@ public class MainActivity extends AppCompatActivity {
 
     private String[][] techLists;
 
-    // AID мора да се совпаѓа ТОЧНО со apduservice.xml во StudentApp
-    // F0 43 4C 41 53 53 01 = "F0CLASS\x01" (custom vendor AID)
     private static final byte[] CPS_AID = new byte[]{
             (byte)0xF0, 0x43, 0x4C, 0x41, 0x53, 0x53, 0x01
     };
 
-    // SELECT AID command (ISO 7816-4): CLA INS P1 P2 Lc [AID]
     private static final byte[] SELECT_APDU = buildSelectApdu(CPS_AID);
 
     private ActivityMainBinding binding;
@@ -47,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
     private String authToken;
     private boolean sessionActive = true;
 
-    // Заштита од двоен tap — игнорира ист студент во рок од 2 секунди
     private String lastTappedId = "";
     private long lastTapTime = 0;
 
@@ -91,12 +87,12 @@ public class MainActivity extends AppCompatActivity {
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
 
         if (nfcAdapter == null) {
-            binding.tvNfcStatus.setText("❌ Овој уред нема NFC");
+            binding.tvNfcStatus.setText("Овој уред нема NFC");
             binding.tvNfcStatus.setTextColor(0xFFEF5350);
             return;
         }
         if (!nfcAdapter.isEnabled()) {
-            binding.tvNfcStatus.setText("⚠️ Вклучи го NFC во поставки");
+            binding.tvNfcStatus.setText("Вклучи го NFC во поставки");
             binding.tvNfcStatus.setTextColor(0xFFFFA726);
         }
 
@@ -113,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
         binding.btnEndSession.setOnClickListener(v -> {
             sessionActive = false;
             if (nfcAdapter != null) nfcAdapter.disableForegroundDispatch(this);
-            binding.tvNfcStatus.setText("⛔ Сесијата е завршена");
+            binding.tvNfcStatus.setText("Сесијата е завршена");
             binding.tvNfcStatus.setTextColor(0xFFEF5350);
             binding.btnEndSession.setEnabled(false);
             startBulkSync();
@@ -128,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
             // Конкретната филтрација ја правиме во onNewIntent со IsoDep.
             nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, techLists);
             Log.d("NFC_DEBUG", "ForegroundDispatch enabled, NFC adapter: " + nfcAdapter);
-            binding.tvNfcStatus.setText("📡 NFC слуша...");
+            binding.tvNfcStatus.setText("NFC слуша...");
             binding.tvNfcStatus.setTextColor(0xFF4CAF50);
         }
     }
@@ -148,8 +144,6 @@ public class MainActivity extends AppCompatActivity {
         Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
         if (tag == null) return;
 
-        // ЗОШТО нова нишка? IsoDep.transceive() е блокирачки I/O повик —
-        // не смее да се извршува на главната (UI) нишка
         new Thread(() -> readHceData(tag)).start();
     }
 
@@ -163,11 +157,9 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             isoDep.connect();
-            // Испрати SELECT AID — StudentApp ќе врати JSON payload + 90 00
             byte[] response = isoDep.transceive(SELECT_APDU);
             isoDep.close();
 
-            // Последните 2 bytes се статус код: 90 00 = SUCCESS
             if (response.length < 2) {
                 runOnUiThread(() -> showFeedback(false, "Празен одговор од студент"));
                 return;
@@ -187,13 +179,11 @@ public class MainActivity extends AppCompatActivity {
             String jsonStr = new String(jsonBytes, "UTF-8");
 
             JSONObject data = new JSONObject(jsonStr);
-            // ЗОШТО camelCase овде?
-            // StudentApp.buildPayload() испраќа "studentId" и "studentName"
+
             String studentId   = data.getString("studentId");
             String studentName = data.getString("studentName");
             String course      = data.optString("course", "General");
 
-            // Анти-дупликат: ист студент, рок 2 секунди
             long now = System.currentTimeMillis();
             if (studentId.equals(lastTappedId) && (now - lastTapTime) < 2000) {
                 return;
@@ -218,10 +208,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // ПОПРАВЕНО: без Le byte на крај
     private static byte[] buildSelectApdu(byte[] aid) {
-        // ISO 7816-4 SELECT AID: CLA INS P1 P2 Lc [AID]
-        // БЕЗ Le byte — тоа го правеше CeErrorEventHandler да спами
+
         byte[] apdu = new byte[5 + aid.length];
         apdu[0] = 0x00;
         apdu[1] = (byte) 0xA4;
@@ -253,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     binding.syncProgressBar.setVisibility(View.GONE);
                     binding.btnSync.setEnabled(true);
-                    binding.tvSyncStatus.setText("✅ " + totalSynced + " записи синхронизирани");
+                    binding.tvSyncStatus.setText("" + totalSynced + " записи синхронизирани");
                 });
             }
             @Override public void onError(String errorMessage) {

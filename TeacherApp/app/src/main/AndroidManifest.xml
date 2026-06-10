@@ -27,19 +27,6 @@
             </intent-filter>
         </activity>
 
-        <!--
-            ЗОШТО само TAG_DISCOVERED, без NDEF_DISCOVERED?
-
-            HCE (Host-based Card Emulation) на StudentApp НЕ испраќа NDEF порака.
-            Студентскиот телефон се однесува како ISO 7816 smart card.
-            Ние испраќаме SELECT AID APDU команда и добиваме JSON одговор.
-
-            NDEF_DISCOVERED = за физички NFC тагови/стикери или Android Beam.
-            TAG_DISCOVERED  = за сите NFC уреди, вклучувајќи HCE.
-
-            Foreground Dispatch во onResume() ги прифаќа сите тагови без
-            филтер, така TAG_DISCOVERED intent-filter служи само како fallback.
-        -->
         <activity
             android:name=".MainActivity"
             android:exported="true"

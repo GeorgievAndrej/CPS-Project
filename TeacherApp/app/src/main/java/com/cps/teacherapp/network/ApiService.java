@@ -16,17 +16,6 @@ public interface ApiService {
     @POST("api/login.php")
     Call<LoginResponse> login(@Body LoginRequest request);
 
-    /*
-     * ЗОШТО syncSingleRecord наместо bulk?
-     *
-     * AttendanceRepository.syncUnsynced() итерира еден по еден со .execute()
-     * (блокирачки повик во позадинска нишка) за да го прати прогресот
-     * back до UI-от (onProgress callback).
-     *
-     * Backend-от го прифаќа ист payload — обвиткан во { "records": [...] }
-     * со еден елемент. Ова е поедноставно од имплементирање на посебен
-     * bulk endpoint со различен response shape.
-     */
     @POST("api/attendance.php")
     Call<SyncResponse> syncSingleRecord(
             @Header("Authorization") String bearerToken,

@@ -21,7 +21,6 @@ public class AttendanceAdapter extends
     private final SimpleDateFormat sdf =
             new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
 
-    // DiffUtil би бил подобар, но за почетник setData е доволно
     public void setData(List<AttendanceRecord> newRecords) {
         this.records = newRecords;
         notifyDataSetChanged();
@@ -41,7 +40,6 @@ public class AttendanceAdapter extends
         holder.tvStudentName.setText(r.studentName);
         holder.tvStudentId.setText(r.studentId + " • " + r.courseName);
         holder.tvTime.setText(sdf.format(new Date(r.tappedAt)));
-        // ✅ зелено = синхронизиран, ⏳ = чека
         holder.tvSyncIndicator.setText(r.isSynced ? "✅" : "⏳");
     }
 

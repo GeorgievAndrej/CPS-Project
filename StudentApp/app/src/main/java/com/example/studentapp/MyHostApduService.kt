@@ -43,8 +43,7 @@ class MyHostApduService : HostApduService() {
         if (apdu[0] != 0x00.toByte()) return false
         if (apdu[1] != 0xA4.toByte()) return false
         if (apdu[2] != 0x04.toByte()) return false
-        // ПОПРАВЕНО: Провери ги AID bytes еден по еден
-        // Без ова одговара на СЕКОЈА SELECT команда
+
         for (i in AID.indices) {
             if (apdu[5 + i] != AID[i]) return false
         }

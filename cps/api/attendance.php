@@ -30,12 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit();
     }
 
-    /*
-     * ЗОШТО двојна проверка?
-     * Android app испраќа: { "records": [ {...} ] }  (SyncRequestBody)
-     * Некои клиенти може директно да испратат: [ {...} ] или { ...single... }
-     * Поддржуваме и трите формати за robustness.
-     */
+   
     if (isset($data["records"]) && is_array($data["records"])) {
         $records = $data["records"];
     } elseif (isset($data[0])) {

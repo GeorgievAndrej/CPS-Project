@@ -16,7 +16,6 @@
         android:padding="12dp"
         android:gravity="center_vertical">
 
-        <!-- Иконка / индикатор -->
         <TextView
             android:id="@+id/tvSyncIndicator"
             android:layout_width="24dp"

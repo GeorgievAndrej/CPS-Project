@@ -32,8 +32,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// Мора да се совпаѓа со RetrofitClient.BASE_URL во TeacherApp
-// 10.0.2.2 = localhost на компјутерот кога се користи емулатор
 private const val BASE_URL = "http://192.168.0.134/cps/"
 
 @Composable
@@ -183,12 +181,7 @@ fun ReadyScreen(studentName: String) {
     }
 }
 
-/**
- * Повикува POST /api/login.php на backend-от.
- * ЗОШТО HttpURLConnection наместо Retrofit?
- * За да не додаваме Retrofit зависност во StudentApp —
- * потребен е само еден API повик.
- */
+
 private fun doLogin(
     username: String,
     password: String,

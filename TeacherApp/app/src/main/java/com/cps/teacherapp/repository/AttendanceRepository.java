@@ -17,7 +17,6 @@ import retrofit2.Response;
 
 public class AttendanceRepository {
 
-    // За сега default course_id = 1 (Mathematics 101 од seed data).
     // TODO: Кога се додаде UI за избор на курс, овој ID доаѓа оттаму.
     private static final int DEFAULT_COURSE_ID = 1;
 

@@ -9,9 +9,6 @@ import com.cps.teacherapp.repository.AttendanceRepository;
 import java.util.List;
 import com.cps.teacherapp.data.sync.SyncCallback;
 
-// AndroidViewModel наместо ViewModel — ЗОШТО?
-// Бидејќи ни треба Application Context за Room,
-// AndroidViewModel автоматски го добива
 public class AttendanceViewModel extends AndroidViewModel {
 
     private final AttendanceRepository repository;
@@ -27,7 +24,6 @@ public class AttendanceViewModel extends AndroidViewModel {
         return allRecords;
     }
 
-    // Го повикува repository со callback за UI feedback
     public void insertIfNotDuplicate(AttendanceRecord record,
                                      Runnable onDuplicate,
                                      Runnable onInserted) {
