@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CPS Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #0d1117; color: #e6edf3; min-height: 100vh; }
+
+  /* ── LOGIN ── */
+  #loginPage {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; background: #0d1117;
+  }
+  .login-card {
+    background: #161b22; border: 1px solid #30363d; border-radius: 12px;
+    padding: 40px; width: 360px;
+  }
+  .login-card h1 { font-size: 22px; margin-bottom: 6px; }
+  .login-card p  { color: #8b949e; font-size: 14px; margin-bottom: 28px; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 13px; color: #8b949e; margin-bottom: 6px; }
+  .form-group input {
+    width: 100%; padding: 10px 14px; background: #0d1117;
+    border: 1px solid #30363d; border-radius: 8px; color: #e6edf3; font-size: 14px;
+  }
+  .form-group input:focus { outline: none; border-color: #58a6ff; }
+  .btn-primary {
+    width: 100%; padding: 12px; background: #1f6feb; color: #fff;
+    border: none; border-radius: 8px; font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: background .2s;
+  }
+  .btn-primary:hover { background: #388bfd; }
+  .btn-primary:disabled { background: #21262d; color: #484f58; cursor: not-allowed; }
+  #loginError { color: #f85149; font-size: 13px; margin-top: 12px; text-align: center; }
+
+  /* ── DASHBOARD ── */
+  #dashPage { display: none; }
+  .topbar {
+    background: #161b22; border-bottom: 1px solid #30363d;
+    padding: 0 24px; height: 56px; display: flex; align-items: center; gap: 16px;
+  }
+  .topbar h1 { font-size: 18px; flex: 1; }
+  .topbar span { color: #8b949e; font-size: 13px; }
+  .btn-logout {
+    padding: 6px 14px; background: transparent; border: 1px solid #30363d;
+    border-radius: 6px; color: #8b949e; cursor: pointer; font-size: 13px;
+  }
+  .btn-logout:hover { border-color: #f85149; color: #f85149; }
+
+  .content { padding: 24px; max-width: 1200px; margin: 0 auto; }
+
+  /* ── STAT CARDS ── */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .stat-card {
+    background: #161b22; border: 1px solid #30363d; border-radius: 10px;
+    padding: 20px;
+  }
+  .stat-card .label { color: #8b949e; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; }
+  .stat-card .value { font-size: 32px; font-weight: 700; margin: 6px 0 0; color: #58a6ff; }
+
+  /* ── CHARTS ── */
+  .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  @media (max-width: 768px) { .charts-grid { grid-template-columns: 1fr; } }
+  .chart-card {
+    background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 20px;
+  }
+  .chart-card h3 { font-size: 14px; color: #8b949e; margin-bottom: 16px; }
+
+  /* ── TABLE ── */
+  .table-card { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 20px; }
+  .table-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .table-header h3 { font-size: 16px; flex: 1; }
+  .filter-input {
+    padding: 7px 12px; background: #0d1117; border: 1px solid #30363d;
+    border-radius: 6px; color: #e6edf3; font-size: 13px; width: 180px;
+  }
+  .filter-input:focus { outline: none; border-color: #58a6ff; }
+  .btn-refresh {
+    padding: 7px 14px; background: #21262d; border: 1px solid #30363d;
+    border-radius: 6px; color: #e6edf3; cursor: pointer; font-size: 13px;
+  }
+  .btn-refresh:hover { background: #30363d; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 10px 14px; color: #8b949e; border-bottom: 1px solid #30363d; font-weight: 500; }
+  td { padding: 10px 14px; border-bottom: 1px solid #21262d; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #1c2128; }
+  .badge {
+    display: inline-block; padding: 2px 8px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+  .badge-synced   { background: #1a4731; color: #3fb950; }
+  .badge-unsynced { background: #3d1f1f; color: #f85149; }
+  #tableEmpty { text-align: center; padding: 40px; color: #8b949e; }
+  .loading { text-align: center; padding: 40px; color: #8b949e; }
+</style>
+</head>
+<body>
+
+<!-- ══════ LOGIN ══════ -->
+<div id="loginPage">
+  <div class="login-card">
+    <h1>🎓 CPS Dashboard</h1>
+    <p>Classroom Presence System</p>
+    <div class="form-group">
+      <label>Корисничко име</label>
+      <input type="text" id="loginUser" placeholder="admin" autocomplete="username">
+    </div>
+    <div class="form-group">
+      <label>Лозинка</label>
+      <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn-primary" id="btnLogin">Најави се</button>
+    <div id="loginError"></div>
+  </div>
+</div>
+
+<!-- ══════ DASHBOARD ══════ -->
+<div id="dashPage">
+  <div class="topbar">
+    <h1>📊 CPS Dashboard</h1>
+    <span id="welcomeMsg"></span>
+    <button class="btn-logout" id="btnLogout">Одјави се</button>
+  </div>
+
+  <div class="content">
+    <!-- Stat Cards -->
+    <div class="stats-grid">
+      <div class="stat-card"><div class="label">Вкупно денес</div><div class="value" id="statToday">—</div></div>
+      <div class="stat-card"><div class="label">Оваа недела</div><div class="value" id="statWeek">—</div></div>
+      <div class="stat-card"><div class="label">Уникатни студенти</div><div class="value" id="statStudents">—</div></div>
+      <div class="stat-card"><div class="label">Вкупно сесии</div><div class="value" id="statSessions">—</div></div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-grid">
+      <div class="chart-card">
+        <h3>Присуство по курс</h3>
+        <canvas id="chartCourse" height="220"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Тренд — последни 30 дена</h3>
+        <canvas id="chartTrend" height="220"></canvas>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-card">
+      <div class="table-header">
+        <h3>Записи за присуство</h3>
+        <input class="filter-input" id="filterName" type="text" placeholder="Пребарај студент...">
+        <input class="filter-input" id="filterDateFrom" type="date" title="Од датум">
+        <input class="filter-input" id="filterDateTo"   type="date" title="До датум">
+        <button class="btn-refresh" id="btnApply">Примени</button>
+        <button class="btn-refresh" id="btnReset">Ресет</button>
+      </div>
+      <div id="tableWrap">
+        <div class="loading">Се вчитуваат записи...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CONFIG ──
+// Промени ја BASE_URL ако серверот е на поинаква адреса
+const BASE_URL = 'http://localhost:8080/cps/';
+
+let token = null;
+let courseChart = null;
+let trendChart  = null;
+
+// ══════ LOGIN ══════
+document.getElementById('loginPass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+document.getElementById('btnLogin').addEventListener('click', doLogin);
+
+async function doLogin() {
+  const username = document.getElementById('loginUser').value.trim();
+  const password = document.getElementById('loginPass').value;
+  const errEl    = document.getElementById('loginError');
+  const btn      = document.getElementById('btnLogin');
+
+  if (!username || !password) { errEl.textContent = 'Внеси корисничко ime и лозинка'; return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Се поврзувам...';
+  errEl.textContent = '';
+
+  try {
+    const res  = await fetch(BASE_URL + 'api/login.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error || 'Грешка при најавување');
+
+    const role = data.user?.role;
+    if (role !== 'admin' && role !== 'teacher') {
+      throw new Error('Само admin или teacher може да пристапи');
+    }
+
+    token = data.access_token;
+    document.getElementById('welcomeMsg').textContent =
+      `👤 ${data.user.full_name} (${role})`;
+
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('dashPage').style.display  = 'block';
+
+    loadAll();
+  } catch (e) {
+    errEl.textContent = e.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Најави се';
+  }
+}
+
+document.getElementById('btnLogout').addEventListener('click', () => {
+  token = null;
+  document.getElementById('dashPage').style.display  = 'none';
+  document.getElementById('loginPage').style.display = 'flex';
+});
+
+// ══════ DATA LOADING ══════
+async function loadAll() {
+  await Promise.all([loadStats(), loadAttendance()]);
+}
+
+async function loadStats() {
+  try {
+    const res  = await fetch(BASE_URL + 'api/statistics.php', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const data = await res.json();
+
+    const courses = data.course_stats || [];
+    const trend   = data.daily_trend  || [];
+
+    // Stat cards
+    const today     = new Date().toISOString().slice(0, 10);
+    const weekAgo   = new Date(Date.now() - 7*86400000).toISOString().slice(0, 10);
+    const todayCount = trend.filter(d => d.date === today).reduce((s, d) => s + Number(d.count), 0);
+    const weekCount  = trend.filter(d => d.date >= weekAgo).reduce((s, d) => s + Number(d.count), 0);
+    const totalStudents = courses.reduce((s, c) => s + Number(c.unique_students), 0);
+    const totalSessions = courses.reduce((s, c) => s + Number(c.total_sessions), 0);
+
+    document.getElementById('statToday').textContent    = todayCount;
+    document.getElementById('statWeek').textContent     = weekCount;
+    document.getElementById('statStudents').textContent = totalStudents;
+    document.getElementById('statSessions').textContent = totalSessions;
+
+    // Bar chart — per course
+    if (courseChart) courseChart.destroy();
+    courseChart = new Chart(document.getElementById('chartCourse'), {
+      type: 'bar',
+      data: {
+        labels: courses.map(c => c.code || c.name),
+        datasets: [{
+          label: 'Записи',
+          data: courses.map(c => c.total_records),
+          backgroundColor: '#1f6feb',
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: '#8b949e' }, grid: { color: '#21262d' } },
+          y: { ticks: { color: '#8b949e' }, grid: { color: '#21262d' }, beginAtZero: true }
+        }
+      }
+    });
+
+    // Line chart — daily trend
+    if (trendChart) trendChart.destroy();
+    trendChart = new Chart(document.getElementById('chartTrend'), {
+      type: 'line',
+      data: {
+        labels: trend.map(d => d.date),
+        datasets: [{
+          label: 'Присуства',
+          data: trend.map(d => d.count),
+          borderColor: '#3fb950',
+          backgroundColor: 'rgba(63,185,80,0.1)',
+          fill: true, tension: 0.3, pointRadius: 3
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: '#8b949e', maxTicksLimit: 8 }, grid: { color: '#21262d' } },
+          y: { ticks: { color: '#8b949e' }, grid: { color: '#21262d' }, beginAtZero: true }
+        }
+      }
+    });
+
+  } catch (e) {
+    console.error('Stats error', e);
+  }
+}
+
+async function loadAttendance() {
+  const wrap = document.getElementById('tableWrap');
+  wrap.innerHTML = '<div class="loading">Се вчитуваат записи...</div>';
+
+  const name     = document.getElementById('filterName').value.trim();
+  const dateFrom = document.getElementById('filterDateFrom').value;
+  const dateTo   = document.getElementById('filterDateTo').value;
+
+  const params = new URLSearchParams();
+  if (name)     params.set('student_name', name);
+  if (dateFrom) params.set('date_from', dateFrom);
+  if (dateTo)   params.set('date_to', dateTo);
+
+  try {
+    const res  = await fetch(BASE_URL + 'api/attendance.php?' + params, {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const data = await res.json();
+    renderTable(data.items || []);
+  } catch (e) {
+    wrap.innerHTML = '<div class="loading" style="color:#f85149">Грешка при вчитување</div>';
+  }
+}
+
+function renderTable(items) {
+  const wrap = document.getElementById('tableWrap');
+
+  if (!items.length) {
+    wrap.innerHTML = '<div id="tableEmpty">Нема записи за избраните филтри</div>';
+    return;
+  }
+
+  const rows = items.map(r => {
+    const dt      = new Date(r.tapped_at).toLocaleString('mk-MK');
+    const synced  = r.is_duplicate == 0;
+    const badge   = `<span class="badge ${synced ? 'badge-synced' : 'badge-unsynced'}">
+                       ${synced ? '✓ OK' : '⚠ Дупликат'}
+                     </span>`;
+    return `<tr>
+      <td>${escHtml(r.student_name)}</td>
+      <td>${escHtml(r.student_external_id)}</td>
+      <td>${escHtml(r.course_name || r.course_id)}</td>
+      <td>${dt}</td>
+      <td>${escHtml(r.session_id || '—')}</td>
+      <td>${badge}</td>
+    </tr>`;
+  }).join('');
+
+  wrap.innerHTML = `
+    <table>
+      <thead><tr>
+        <th>Студент</th><th>ID</th><th>Курс</th>
+        <th>Време</th><th>Сесија</th><th>Статус</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+function escHtml(str) {
+  return String(str ?? '')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+document.getElementById('btnApply').addEventListener('click', loadAttendance);
+document.getElementById('btnReset').addEventListener('click', () => {
+  document.getElementById('filterName').value     = '';
+  document.getElementById('filterDateFrom').value = '';
+  document.getElementById('filterDateTo').value   = '';
+  loadAttendance();
+});
+</script>
+</body>
+</html>

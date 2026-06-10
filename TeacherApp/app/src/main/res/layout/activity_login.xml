@@ -1,103 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
     android:padding="32dp"
-    android:background="#F5F5F5">
+    android:background="#1A237E">
 
     <TextView
-        android:id="@+id/tvTitle"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="CPS Teacher"
         android:textSize="32sp"
+        android:textColor="#FFFFFF"
         android:textStyle="bold"
-        android:textColor="#1A237E"
-        android:gravity="center"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="80dp"/>
+        android:layout_marginBottom="8dp"/>
 
     <TextView
-        android:id="@+id/tvSubtitle"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Classroom Presence System"
         android:textSize="14sp"
-        android:textColor="#888888"
-        android:gravity="center"
-        app:layout_constraintTop_toBottomOf="@id/tvTitle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp"/>
+        android:textColor="#90CAF9"
+        android:layout_marginBottom="40dp"/>
 
-    <EditText
-        android:id="@+id/etUsername"
-        android:layout_width="0dp"
-        android:layout_height="56dp"
-        android:hint="Корисничко име"
-        android:inputType="text"
-        android:background="@drawable/rounded_input"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:textSize="16sp"
-        app:layout_constraintTop_toBottomOf="@id/tvSubtitle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="48dp"/>
-
-    <EditText
-        android:id="@+id/etPassword"
-        android:layout_width="0dp"
-        android:layout_height="56dp"
-        android:hint="Лозинка"
-        android:inputType="textPassword"
-        android:background="@drawable/rounded_input"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:textSize="16sp"
-        app:layout_constraintTop_toBottomOf="@id/etUsername"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"/>
-
-    <TextView
-        android:id="@+id/tvError"
-        android:layout_width="0dp"
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text=""
-        android:textColor="#B71C1C"
-        android:textSize="14sp"
-        android:gravity="center"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/etPassword"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp"/>
+        android:hint="Корисничко име"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_marginBottom="16dp">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etUsername"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:inputType="text"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Лозинка"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        app:passwordToggleEnabled="true"
+        android:layout_marginBottom="24dp"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:inputType="textPassword"/>
+    </com.google.android.material.textfield.TextInputLayout>
 
     <Button
         android:id="@+id/btnLogin"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:text="Најави се"
+        android:text="НАЈАВИ СЕ"
         android:textSize="16sp"
-        android:backgroundTint="#1A237E"
-        app:layout_constraintTop_toBottomOf="@id/tvError"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="24dp"/>
+        android:backgroundTint="#1565C0"/>
 
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/btnLogin"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="16dp"
+        android:visibility="gone"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:id="@+id/tvError"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#EF9A9A"
+        android:layout_marginTop="8dp"
+        android:visibility="gone"/>
+
+</LinearLayout>

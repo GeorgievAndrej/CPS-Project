@@ -1,61 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp"
-    android:background="#F5F5F5">
+    android:orientation="vertical"
+    android:background="#0D1117">
 
-    <TextView
-        android:id="@+id/tvWelcome"
-        android:layout_width="0dp"
+    <!-- Статус бар -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Добредојде!"
-        android:textSize="24sp"
+        android:orientation="horizontal"
+        android:background="#1A237E"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="CPS Teacher"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
+
+        <Button
+            android:id="@+id/btnEndSession"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="Заврши"
+            android:textSize="12sp"
+            android:backgroundTint="#C62828"/>
+    </LinearLayout>
+
+    <!-- NFC Status Card -->
+    <androidx.cardview.widget.CardView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:cardBackgroundColor="#1E2A3A"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="4dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/tvNfcStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📡 NFC слуша..."
+                android:textColor="#4CAF50"
+                android:textSize="18sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/tvSessionInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#90CAF9"
+                android:textSize="12sp"
+                android:layout_marginTop="4dp"/>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Бројач -->
+    <TextView
+        android:id="@+id/tvRecordCount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Присутни: 0"
+        android:textColor="#FFFFFF"
+        android:textSize="22sp"
         android:textStyle="bold"
-        android:textColor="#1A237E"
         android:gravity="center"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="60dp"/>
+        android:layout_marginBottom="8dp"/>
 
-    <TextView
-        android:id="@+id/tvStatus"
-        android:layout_width="0dp"
+    <!-- Листа на присутни -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginHorizontal="16dp"/>
+
+    <!-- Sync Panel -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="⚪ Сесијата не е активна"
-        android:textSize="16sp"
-        android:gravity="center"
-        android:textColor="#555555"
-        app:layout_constraintTop_toBottomOf="@id/tvWelcome"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="32dp"/>
+        android:orientation="vertical"
+        android:background="#1E2A3A"
+        android:padding="16dp">
 
-    <Button
-        android:id="@+id/btnStartSession"
-        android:layout_width="0dp"
-        android:layout_height="56dp"
-        android:text="Започни Сесија"
-        android:textSize="16sp"
-        android:backgroundTint="#1A237E"
-        app:layout_constraintTop_toBottomOf="@id/tvStatus"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="48dp"/>
+        <TextView
+            android:id="@+id/tvSyncStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Нема несинхронизирани записи"
+            android:textColor="#90CAF9"
+            android:textSize="13sp"
+            android:layout_marginBottom="8dp"/>
 
-    <Button
-        android:id="@+id/btnLogout"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:text="Одјави се"
-        android:textSize="14sp"
-        android:backgroundTint="#B71C1C"
-        app:layout_constraintTop_toBottomOf="@id/btnStartSession"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"/>
+        <ProgressBar
+            android:id="@+id/syncProgressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:visibility="gone"
+            android:progressTint="#1565C0"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <Button
+            android:id="@+id/btnSync"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="☁ СИНХРОНИЗИРАЈ СО СЕРВЕР"
+            android:backgroundTint="#1565C0"
+            android:layout_marginTop="8dp"/>
+    </LinearLayout>
+
+</LinearLayout>

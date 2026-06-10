@@ -17,34 +17,56 @@ if (!$auth) {
     exit();
 }
 
-$db = (new Database())->getConnection();
+$db         = (new Database())->getConnection();
 $attendance = new Attendance($db);
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $data = json_decode(file_get_contents("php://input"), true);
+    $raw  = file_get_contents("php://input");
+    $data = json_decode($raw, true);
 
-    if (empty($data["records"])) {
+    if (!$data) {
+        http_response_code(400);
+        echo json_encode(["error" => "Invalid JSON"]);
+        exit();
+    }
+
+    /*
+     * ЗОШТО двојна проверка?
+     * Android app испраќа: { "records": [ {...} ] }  (SyncRequestBody)
+     * Некои клиенти може директно да испратат: [ {...} ] или { ...single... }
+     * Поддржуваме и трите формати за robustness.
+     */
+    if (isset($data["records"]) && is_array($data["records"])) {
+        $records = $data["records"];
+    } elseif (isset($data[0])) {
+        $records = $data;
+    } else {
+        $records = [$data];
+    }
+
+    if (empty($records)) {
         http_response_code(400);
         echo json_encode(["error" => "No records provided"]);
         exit();
     }
 
-    $result = $attendance->bulkInsert($data["records"], $auth["sub"]);
+    $result = $attendance->bulkInsert($records, $auth["sub"]);
     http_response_code(201);
     echo json_encode(array_merge(
-        ["received" => count($data["records"])],
+        ["received" => count($records)],
         $result
     ));
 
 } else {
+    // GET — врати ги записите со филтри
     $filters = [
-        "course_id" => $_GET["course_id"] ?? null,
+        "course_id"    => $_GET["course_id"]    ?? null,
         "student_name" => $_GET["student_name"] ?? null,
-        "date_from" => $_GET["date_from"] ?? null,
-        "date_to" => $_GET["date_to"] ?? null,
+        "date_from"    => $_GET["date_from"]    ?? null,
+        "date_to"      => $_GET["date_to"]      ?? null,
     ];
 
-    // Role-based: teacher sees only their data
+    // Role-based: наставникот гледа само свои записи
     if ($auth["role"] === "teacher") {
         $filters["teacher_id"] = $auth["sub"];
     }

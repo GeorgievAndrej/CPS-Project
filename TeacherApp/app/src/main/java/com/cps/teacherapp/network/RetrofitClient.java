@@ -7,7 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitClient {
     // 10.0.2.2 = localhost на компјутерот кога се користи емулатор
-    private static final String BASE_URL = "http://10.0.2.2:8080/cps/";
+    private static final String BASE_URL = "http://192.168.0.134/cps/";
     private static RetrofitClient instance;
     private final ApiService apiService;
 

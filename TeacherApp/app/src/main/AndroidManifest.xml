@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.NFC" />
-    <uses-feature android:name="android.hardware.nfc" android:required="false" />
+    <uses-permission android:name="android.permission.NFC"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+
+    <uses-feature
+        android:name="android.hardware.nfc"
+        android:required="true"/>
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:label="CPS Teacher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TeacherApp"
@@ -18,15 +22,33 @@
             android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
+        <!--
+            ЗОШТО само TAG_DISCOVERED, без NDEF_DISCOVERED?
+
+            HCE (Host-based Card Emulation) на StudentApp НЕ испраќа NDEF порака.
+            Студентскиот телефон се однесува како ISO 7816 smart card.
+            Ние испраќаме SELECT AID APDU команда и добиваме JSON одговор.
+
+            NDEF_DISCOVERED = за физички NFC тагови/стикери или Android Beam.
+            TAG_DISCOVERED  = за сите NFC уреди, вклучувајќи HCE.
+
+            Foreground Dispatch во onResume() ги прифаќа сите тагови без
+            филтер, така TAG_DISCOVERED intent-filter служи само како fallback.
+        -->
         <activity
             android:name=".MainActivity"
-            android:exported="false" />
+            android:exported="true"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.nfc.action.TAG_DISCOVERED"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
 
     </application>
-
 </manifest>
